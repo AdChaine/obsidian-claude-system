@@ -1,6 +1,6 @@
 {
   "name": "obsidian-memory",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Mémoire persistante sur un vault Obsidian : /resume, /compress, /preserve, /scaffold, /client-brief, /audit-vault, /lint-vault et la gouvernance des notes.",
   "author": {
     "name": "obsidian-memory contributors"

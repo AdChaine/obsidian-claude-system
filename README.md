@@ -11,6 +11,38 @@ Un **système de mémoire persistante** pour [Claude Code](https://claude.com/cl
 
 ---
 
+## Pour qui ?
+
+| C'est fait pour toi si… | Pas besoin si… |
+|---|---|
+| Tu utilises déjà Claude Code régulièrement | Tu découvres Claude Code |
+| Tu jongles entre plusieurs clients ou projets en parallèle | Tu travailles sur un seul projet |
+| Tu en as assez de réexpliquer le contexte à chaque session | Un `CLAUDE.md` bien rempli te suffit encore |
+
+Pour un seul projet, commence par un simple `CLAUDE.md` et un fichier `NOTES.md` : tu as l'essentiel de l'effet sans outil. Ce système prend le relais le jour où ce fichier devient trop gros.
+
+**Le prix à payer :** la mémoire n'est à jour que si tu termines tes sessions par `/compress`. Le système structure et contrôle, il ne remplace pas cette habitude.
+
+**Obsidian est facultatif.** Claude lit et écrit directement les fichiers Markdown du vault ; Obsidian sert seulement à les consulter et à naviguer entre les liens.
+
+---
+
+## Démarrage rapide
+
+Tu as déjà Claude Code et Git ? Trois commandes (Mac / Linux) :
+
+```bash
+git clone https://github.com/AdChaine/obsidian-claude-system.git
+cd obsidian-claude-system && ./install.sh "$HOME/Documents/mon-cerveau"
+cd "$HOME/Documents/mon-cerveau" && claude
+```
+
+Puis tape `/resume`. Le script installe les skills **et crée ton vault** dans `~/Documents/mon-cerveau` à partir du modèle (un vault existant n'est jamais écrasé). Sous Windows : `.\install.ps1 -VaultPath "$env:USERPROFILE\Documents\mon-cerveau"`.
+
+Première fois avec un terminal ? Suis le [guide pas à pas](#installation).
+
+---
+
 ## Ce que ça fait
 
 - **`/resume`** — reprend le contexte d'un client/projet en 30 s, en ne chargeant que les fichiers utiles (chasse aux tokens).
@@ -70,17 +102,20 @@ Cowork et mode chat : guide pas à pas dans **[docs/claude-desktop.md](docs/clau
 
 ### Ce que tu vas installer
 
-Trois outils sont nécessaires. Voici ce que chacun fait, en une phrase :
+Deux outils sont nécessaires, un troisième est conseillé :
 
 | Outil | Ce que c'est | Coût |
 |---|---|---|
-| **Obsidian** | Une application de notes sur ton ordinateur (comme Notion, mais hors ligne) | Gratuit |
 | **Claude Code** | L'assistant IA d'Anthropic — comme ChatGPT, mais dans ton terminal | Abonnement Claude Pro requis |
-| **Git** | Un outil qui télécharge des projets depuis GitHub sur ton ordinateur | Gratuit |
+| **Git** | Un outil qui télécharge des projets depuis GitHub sur ton ordinateur (facultatif : un ZIP suffit) | Gratuit |
+| **Obsidian** (facultatif) | Une application pour lire tes notes et naviguer entre les liens (comme Notion, mais hors ligne) | Gratuit |
 
 ---
 
-### Étape 1 — Installe Obsidian
+### Étape 1 — Installe Obsidian (facultatif)
+
+Tu peux sauter cette étape : Claude n'en a pas besoin. Obsidian rend simplement tes notes agréables à lire.
+
 
 1. Va sur [obsidian.md](https://obsidian.md)
 2. Clique sur **"Download"**
@@ -179,7 +214,9 @@ cd $env:USERPROFILE\Desktop\obsidian-claude-system
 
 ### Étape 6 — Lance l'installation
 
-Remplace `mon-cerveau` par le nom que tu veux donner à ton vault (sans espaces, sans accents de préférence).
+Cette commande fait deux choses : elle installe les skills dans Claude Code **et crée ton vault** (ton dossier de notes) à partir du modèle `vault-template/`. Remplace `mon-cerveau` par le nom que tu veux (sans espaces, sans accents de préférence).
+
+> Le vault est créé **en dehors** du dossier téléchargé, exprès : tes notes ne doivent pas vivre dans le dépôt, sinon une mise à jour (`git pull`) pourrait entrer en conflit avec elles. Le script refuse d'ailleurs un chemin situé dans le dépôt. Si le dossier existe déjà et contient des fichiers, il n'y touche pas.
 
 **Sur Mac ou Linux :**
 ```bash
@@ -202,43 +239,39 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 Puis relance la commande d'installation.
 
-**Dans les deux cas, tu dois voir s'afficher :**
+**Dans les deux cas, tu dois voir s'afficher (à quelques symboles près) :**
 ```
 -> Installation depuis : /ton/chemin/obsidian-claude-system
-  [OK] skill audit-vault installe
-  [OK] skill client-brief installe
-  [OK] skill compress installe
-  [OK] skill lint-vault installe
-  [OK] skill obsidian-note-system installe
-  [OK] skill preserve installe
-  [OK] skill resume installe
-  [OK] skill scaffold installe
-  [OK] chemin du vault fixe : .../Documents/mon-cerveau
-Installation terminee.
+  ✓ skill audit-vault installé
+  …
+  ✓ skill scaffold installé
+  ✓ vault créé à partir du modèle : .../Documents/mon-cerveau
+  ✓ chemin du vault fixé : .../Documents/mon-cerveau
+✅ Installation terminée.
 ```
 
 Si tu vois ce message, l'installation est réussie.
 
 ---
 
-### Étape 7 — Ouvre ton vault dans Obsidian
+### Étape 7 — Ouvre ton vault dans Obsidian (facultatif)
 
-Le dossier `vault-template/` est le squelette de ton vault (= ton espace de notes pour Claude).
+Ton vault est le dossier créé à l'étape 6 (par exemple `Documents/mon-cerveau`). **N'ouvre pas** `vault-template/` dans le dossier téléchargé : c'est seulement le modèle.
 
 1. Ouvre **Obsidian**
 2. Sur l'écran d'accueil, clique sur **"Ouvrir un dossier comme vault"**
-3. Navigue jusqu'au dossier `vault-template/` (situé dans `obsidian-claude-system/vault-template/`)
+3. Choisis le dossier `Documents/mon-cerveau`
 4. Clique sur **"Ouvrir"**
 
-Tu verras apparaître dans Obsidian les dossiers `Clients/`, `Projets/`, `Entreprise/`, `+Inbox/` et `Sessions/`.
+Tu verras apparaître les dossiers `Clients/`, `Projets/`, `Entreprise/`, `Taches/`, `Ressources/` et `+Inbox/`.
 
-> Tu peux renommer et déplacer ce dossier où tu veux — l'important est de noter le chemin exact pour plus tard.
+> Si tu déplaces ce dossier plus tard, relance l'installation avec le nouveau chemin.
 
 ---
 
 ### Étape 8 — Personnalise CLAUDE.md
 
-Dans Obsidian, ouvre le fichier **`CLAUDE.md`** à la racine du vault. C'est le "cerveau" de Claude : il lui explique qui tu es, ce que tu fais, tes règles.
+Ouvre le fichier **`CLAUDE.md`** à la racine du vault (dans Obsidian ou n'importe quel éditeur de texte). C'est le "cerveau" de Claude : il lui explique qui tu es, ce que tu fais, tes règles.
 
 Remplis au minimum :
 - **Qui je suis** → ton métier, ton contexte (ex : "designer indépendante, 3 clients actifs")
@@ -249,7 +282,14 @@ Remplis au minimum :
 
 ### Étape 9 — Premier test
 
-Ouvre **Claude Code** dans ton Terminal (tape `claude` et appuie sur `Entrée`), puis tape :
+Dans ta console, place-toi dans ton vault puis lance Claude Code :
+
+```bash
+cd "$HOME/Documents/mon-cerveau"
+claude
+```
+
+(Windows : `cd "$env:USERPROFILE\Documents\mon-cerveau"` puis `claude`.) Ensuite, tape :
 
 ```
 /resume
@@ -270,7 +310,9 @@ Claude doit te demander quel client ou projet reprendre. Si tu vois cette questi
 | `permission denied` sur `install.sh` | Mac/Linux | Tape `chmod +x install.sh` puis relance |
 | Erreur de sécurité sur `install.ps1` | Windows | Tape `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` puis relance |
 | Obsidian ne voit aucune note | Tous | Vérifie que tu as ouvert le **dossier** comme vault (celui qui contient `CLAUDE.md`) |
-| Claude ne connaît pas ton vault | Tous | Vérifie que `CLAUDE.md` est rempli et que le chemin du vault est correct |
+| Claude ne connaît pas ton vault | Tous | Lance `claude` **depuis le dossier du vault**, et vérifie que `CLAUDE.md` est rempli |
+| Le dossier du vault est vide ou n'existe pas | Tous | Relance l'installation avec le chemin du vault (étape 6) : le script le crée à partir du modèle |
+| Tes notes sont dans `obsidian-claude-system/vault-template/` | Tous | Déplace-les vers ton vault (ex. `Documents/mon-cerveau`) : le dossier du dépôt est réservé aux mises à jour |
 | `git` non reconnu | Tous | Installe Git (voir Étape 4) ou utilise le téléchargement ZIP |
 
 ---
@@ -291,7 +333,7 @@ git pull
 .\install.ps1 -VaultPath "$env:USERPROFILE\Documents\mon-cerveau"
 ```
 
-Tes notes Obsidian ne sont jamais modifiées lors d'une mise à jour.
+Tes notes ne sont jamais modifiées lors d'une mise à jour : le script voit que le vault existe déjà et n'y copie rien.
 
 ---
 

@@ -2,6 +2,16 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versions selon [SemVer](https://semver.org/lang/fr/).
 
+## [2.0.1] — 2026-11-06
+
+### Corrigé
+- `install.sh` et `install.ps1` créent désormais le vault à partir de `vault-template/` quand le chemin donné n'existe pas (ou est vide). Avant, ils fixaient le chemin dans les skills sans créer le dossier, et le README faisait ouvrir `vault-template/` dans le dépôt : les skills cherchaient un vault inexistant et les notes atterrissaient dans le clone git.
+- Un vault existant n'est jamais écrasé ; un chemin situé dans le dépôt est refusé.
+- La CI vérifie l'installation dans un dossier temporaire (création, non-écrasement, refus du dépôt).
+
+### Changé
+- README : sections « Pour qui ? » et « Démarrage rapide » en tête, Obsidian présenté comme facultatif, étapes 6 à 9 alignées sur le vault créé par le script.
+
 ## [2.0.0] — 2026-11-06
 
 Fonctionne désormais dans Claude Desktop (Cowork et mode chat), en plus de Claude Code.
