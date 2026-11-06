@@ -67,10 +67,10 @@ if [ -s $TMPD/lint_long.txt ]; then echo "   $(wc -l < $TMPD/lint_long.txt | tr 
 
 sect "6. Candidats orphelins (aucun lien entrant)"
 grep -rhoE '\[\[[^]|#]+' . --include='*.md' \
-  --exclude-dir=.git --exclude-dir=.obsidian --exclude-dir=.claude 2>/dev/null \
-  | sed 's/^\[\[//' | awk -F'/' '{print $NF}' | sed 's/[[:space:]]*$//; s/\.md$//' | sort -u > $TMPD/lint_liens.txt
+  --exclude-dir=.git --exclude-dir=.obsidian --exclude-dir=.claude --exclude-dir=+Inbox 2>/dev/null \
+  | sed 's/^\[\[//' | awk -F'/' '{print $NF}' | sed 's/\\$//; s/[[:space:]]*$//; s/\.md$//' | sort -u > $TMPD/lint_liens.txt
 find . -type f -name '*.md' \
-  | grep -vE '/(\.obsidian|\.git|\.claude|Sessions|archives|\+Inbox)/' \
+  | grep -vE '/(\.obsidian|\.git|\.claude|Sessions|archives|Sources|\+Inbox)/' \
   | grep -vE '(-MAP|BRIEF|CLAUDE)\.md$' | grep -viE 'template' \
   | awk -F'/' '{print $NF}' | sed 's/\.md$//' | sort -u > $TMPD/lint_fichiers.txt
 grep -vxFf $TMPD/lint_liens.txt $TMPD/lint_fichiers.txt > $TMPD/lint_orph.txt 2>/dev/null
