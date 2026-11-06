@@ -1,0 +1,29 @@
+name: Bug
+description: Une commande, un script ou l'installation ne se comporte pas comme prévu
+labels: [bug]
+body:
+  - type: input
+    id: commande
+    attributes:
+      label: Commande ou script concerné
+      placeholder: "/compress, lint-vault.sh, install.ps1…"
+    validations:
+      required: true
+  - type: textarea
+    id: attendu
+    attributes:
+      label: Ce que vous attendiez / ce qui s'est passé
+      description: Collez la sortie utile. Retirez tout chemin, nom de client ou secret.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Étapes pour reproduire
+  - type: input
+    id: env
+    attributes:
+      label: Environnement
+      placeholder: "macOS 15 / Ubuntu 24.04 / Windows 11 — version de Claude Code"
+    validations:
+      required: true

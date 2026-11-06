@@ -1,0 +1,25 @@
+# --- Sécurité : ne JAMAIS versionner de secret ---
+# Le système impose "zéro secret dans le vault" (règle de gouvernance).
+# Ce .gitignore est la barrière technique complémentaire si vous versionnez votre vault.
+.env
+.env.*
+*.key
+*.pem
+secrets.*
+*credentials*
+*password*
+
+# Config locale Obsidian (espaces de travail, plugins, cache)
+.obsidian/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporaires
+*.tmp
+*.bak
+*.p12
+*.pfx
+*token*
+id_rsa*

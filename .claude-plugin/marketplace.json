@@ -1,0 +1,15 @@
+{
+  "name": "obsidian-memory",
+  "owner": {
+    "name": "obsidian-memory contributors"
+  },
+  "plugins": [
+    {
+      "name": "obsidian-memory",
+      "source": "./",
+      "description": "Mémoire persistante sur un vault Obsidian pour Claude Code et Cowork.",
+      "version": "2.0.0"
+    }
+  ],
+  "description": "Mémoire persistante pour Claude sur un vault Obsidian (Claude Code et Cowork)."
+}

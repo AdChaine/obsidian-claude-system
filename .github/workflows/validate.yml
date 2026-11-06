@@ -1,0 +1,21 @@
+name: Validate skills
+
+# Filet de sécurité : vérifie le frontmatter et le standard XML des skills à chaque push / PR.
+# Le même contrôle est exécutable en local : ./scripts/validate-skills.sh
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Valider les skills et les manifestes du plugin
+        run: bash scripts/validate-skills.sh
+      - name: Vérifier que les paquets se construisent
+        run: bash scripts/package.sh
+      - name: Le vault modèle respecte son propre schéma
+        run: sh skills/lint-vault/scripts/lint-vault.sh vault-template

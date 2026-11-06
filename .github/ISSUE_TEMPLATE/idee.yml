@@ -1,0 +1,19 @@
+name: Idée
+description: Proposer une commande, un type de note ou une amélioration
+labels: [enhancement]
+body:
+  - type: textarea
+    id: probleme
+    attributes:
+      label: Quel problème ça résout ?
+      description: Le cas concret rencontré avec votre vault.
+    validations:
+      required: true
+  - type: textarea
+    id: proposition
+    attributes:
+      label: Ce que vous proposez
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives envisagées

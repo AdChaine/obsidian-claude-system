@@ -1,0 +1,20 @@
+{
+  "name": "obsidian-memory",
+  "version": "2.0.0",
+  "description": "Mémoire persistante sur un vault Obsidian : /resume, /compress, /preserve, /scaffold, /client-brief, /audit-vault, /lint-vault et la gouvernance des notes.",
+  "author": {
+    "name": "obsidian-memory contributors"
+  },
+  "homepage": "https://github.com/AdChaine/obsidian-claude-system",
+  "repository": "https://github.com/AdChaine/obsidian-claude-system",
+  "license": "MIT",
+  "keywords": [
+    "obsidian",
+    "memory",
+    "second-brain",
+    "pkm",
+    "claude-code",
+    "cowork"
+  ],
+  "icon": ".claude-plugin/icon.png"
+}

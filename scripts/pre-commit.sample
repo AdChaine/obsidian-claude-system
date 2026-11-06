@@ -1,0 +1,11 @@
+#!/bin/sh
+# Refuse un commit si le vault viole son propre schéma.
+# Contourner ponctuellement : git commit --no-verify
+LINT="${LINT_VAULT:-$HOME/.claude/skills/lint-vault/scripts/lint-vault.sh}"
+[ -x "$LINT" ] || [ -f "$LINT" ] || exit 0
+if ! sh "$LINT" "$(git rev-parse --show-toplevel)"; then
+  echo ""
+  echo "Commit refusé : le schéma du vault est violé (voir ci-dessus)."
+  echo "Corrigez, ou forcez avec : git commit --no-verify"
+  exit 1
+fi
