@@ -3,7 +3,8 @@
 # l'onglet Code de Claude Desktop). Alternative sans script : le plugin (voir README).
 # Usage :
 #   ./install.sh                      # installe ; le vault sera détecté ou demandé à l'usage
-#   ./install.sh "/chemin/vers/vault" # installe ET fixe le chemin du vault
+#   ./install.sh "/chemin/vers/vault" # installe, crée le vault à partir de vault-template/
+#                                     # s'il n'existe pas encore, et fixe son chemin
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -33,6 +34,19 @@ for src in "$REPO_DIR"/skills/*/; do
 done
 
 if [ -n "$VAULT_PATH" ]; then
+  case "$VAULT_PATH" in "~"*) VAULT_PATH="$HOME${VAULT_PATH#\~}" ;; esac
+  case "$VAULT_PATH" in "$REPO_DIR"|"$REPO_DIR"/*)
+    echo "  ✗ Le vault ne doit pas être dans le dossier du dépôt ($REPO_DIR) :"
+    echo "    un git pull pourrait entrer en conflit avec tes notes. Choisis un autre chemin."
+    exit 1 ;;
+  esac
+  if [ ! -e "$VAULT_PATH" ] || [ -z "$(ls -A "$VAULT_PATH" 2>/dev/null)" ]; then
+    mkdir -p "$VAULT_PATH"
+    cp -R "$REPO_DIR/vault-template/." "$VAULT_PATH/"
+    echo "  ✓ vault créé à partir du modèle : $VAULT_PATH"
+  else
+    echo "  ℹ️  $VAULT_PATH existe déjà et n'est pas vide : il est conservé tel quel (rien n'est copié)."
+  fi
   for f in "$SKILLS_DIR"/*/SKILL.md; do
     grep -q "<VAULT_ROOT>" "$f" || continue
     sed -i.tmp "s|<VAULT_ROOT>|$VAULT_PATH|g" "$f" && rm -f "$f.tmp"
@@ -47,14 +61,18 @@ else
   echo "  ℹ️  Aucun chemin fourni : le vault sera détecté (dossier de travail) ou demandé à l'usage."
 fi
 
-cat <<'EOF'
-
-✅ Installation terminée.
-
-Étapes suivantes :
-  1. Copiez le dossier vault-template/ là où vous voulez votre vault Obsidian.
-  2. Personnalisez son CLAUDE.md (section « Qui je suis »).
-  3. Ouvrez Claude Code dans le vault et tapez /resume.
-
-Skills : /resume · /client-brief · /compress · /preserve · /scaffold · /audit-vault · /lint-vault
-EOF
+echo ""
+echo "✅ Installation terminée."
+echo ""
+echo "Étapes suivantes :"
+if [ -n "$VAULT_PATH" ]; then
+  echo "  1. Personnalise $VAULT_PATH/CLAUDE.md (section « Qui je suis »)."
+  echo "  2. Ouvre Claude Code dans ce dossier : cd \"$VAULT_PATH\" && claude"
+  echo "  3. Tape /resume. (Facultatif : ouvre aussi ce dossier dans Obsidian pour naviguer dans tes notes.)"
+else
+  echo "  1. Crée ton vault : relance ./install.sh \"\$HOME/Documents/mon-cerveau\""
+  echo "     (ou copie vault-template/ hors de ce dépôt, là où tu veux)."
+  echo "  2. Personnalise son CLAUDE.md, ouvre Claude Code dedans et tape /resume."
+fi
+echo ""
+echo "Skills : /resume · /client-brief · /compress · /preserve · /scaffold · /audit-vault · /lint-vault"

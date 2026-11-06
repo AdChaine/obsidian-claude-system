@@ -19,3 +19,14 @@ jobs:
         run: bash scripts/package.sh
       - name: Le vault modèle respecte son propre schéma
         run: sh skills/lint-vault/scripts/lint-vault.sh vault-template
+      - name: install.sh crée le vault hors du dépôt et ne l'écrase jamais
+        run: |
+          T="$(mktemp -d)"
+          HOME="$T" bash install.sh "$T/Documents/mon-cerveau"
+          test -f "$T/Documents/mon-cerveau/CLAUDE.md"
+          ! grep -rl '<VAULT_ROOT>' "$T/.claude/skills"
+          sh skills/lint-vault/scripts/lint-vault.sh "$T/Documents/mon-cerveau"
+          echo "note perso" > "$T/Documents/mon-cerveau/perso.md"
+          HOME="$T" bash install.sh "$T/Documents/mon-cerveau"
+          grep -q "note perso" "$T/Documents/mon-cerveau/perso.md"
+          ! HOME="$T" bash install.sh "$PWD/vault-dans-le-depot"
