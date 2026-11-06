@@ -1,0 +1,14 @@
+{
+  "description": "Mémoire automatique : contexte chargé au démarrage, sauvegarde en cours de session, filet de sécurité à la fermeture.",
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh\"", "timeout": 10 } ] }
+    ],
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/stop.sh\"", "timeout": 10 } ] }
+    ],
+    "SessionEnd": [
+      { "hooks": [ { "type": "command", "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/session-end.sh\"", "timeout": 10 } ] }
+    ]
+  }
+}

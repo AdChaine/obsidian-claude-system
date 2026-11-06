@@ -2,6 +2,20 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versions selon [SemVer](https://semver.org/lang/fr/).
 
+## [2.1.0] — 2026-11-06
+
+### Ajouté
+- **Mémoire automatique** (hooks Claude Code, installés par le script et par le plugin) :
+  - au démarrage, le bloc « Session courante » du projet actif est injecté dans le contexte, sans `/resume` ;
+  - toutes les 8 demandes (`OBSIDIAN_MEMORY_SAVE_EVERY`), Claude ajoute une entrée « (auto) » au log du jour et met à jour la MAP ;
+  - à la fermeture, une session non sauvegardée est notée dans `Sessions/journal-auto.md` (sans appel au modèle) et signalée au démarrage suivant.
+- Les hooks restent muets hors d'un vault ou d'un dépôt relié au vault ; ils ne tournent qu'une fois même si le plugin et le script sont installés ensemble.
+- `install.sh --no-hooks` / `--remove-hooks` (et `-NoHooks` / `-RemoveHooks` sous Windows) ; `settings.json` est fusionné sans toucher aux autres réglages, avec une sauvegarde `.bak`.
+- CI : tests des hooks (`scripts/test-hooks.sh`) et job Windows pour `install.ps1`.
+
+### Changé
+- `/resume` réutilise le contexte déjà injecté ; `/compress` complète le log du jour et sait rattraper une session non sauvegardée.
+
 ## [2.0.1] — 2026-11-06
 
 ### Corrigé

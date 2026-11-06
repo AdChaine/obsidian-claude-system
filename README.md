@@ -21,7 +21,9 @@ Un **système de mémoire persistante** pour [Claude Code](https://claude.com/cl
 
 Pour un seul projet, commence par un simple `CLAUDE.md` et un fichier `NOTES.md` : tu as l'essentiel de l'effet sans outil. Ce système prend le relais le jour où ce fichier devient trop gros.
 
-**Le prix à payer :** la mémoire n'est à jour que si tu termines tes sessions par `/compress`. Le système structure et contrôle, il ne remplace pas cette habitude.
+**Rien à retenir :** avec la [mémoire automatique](#mémoire-automatique), Claude reprend le contexte au démarrage et sauvegarde en cours de session sans que tu tapes quoi que ce soit. `/resume` et `/compress` restent là pour un chargement ciblé ou un bilan complet.
+
+**Et la mémoire intégrée de Claude Code ?** Claude Code retient déjà quelques faits d'une session à l'autre, et pour un usage simple ça suffit. Ce système va plus loin : un vault structuré, lisible par toi, partagé entre tous tes projets et clients, avec des règles vérifiées par un script.
 
 **Obsidian est facultatif.** Claude lit et écrit directement les fichiers Markdown du vault ; Obsidian sert seulement à les consulter et à naviguer entre les liens.
 
@@ -40,6 +42,25 @@ cd "$HOME/Documents/mon-cerveau" && claude
 Puis tape `/resume`. Le script installe les skills **et crée ton vault** dans `~/Documents/mon-cerveau` à partir du modèle (un vault existant n'est jamais écrasé). Sous Windows : `.\install.ps1 -VaultPath "$env:USERPROFILE\Documents\mon-cerveau"`.
 
 Première fois avec un terminal ? Suis le [guide pas à pas](#installation).
+
+---
+
+## Mémoire automatique
+
+Installée par défaut (script ou plugin), active seulement quand Claude Code travaille dans ton vault ou dans un dépôt de code relié au vault (son `CLAUDE.md` commence par `@<vault>/CLAUDE.md`, ce que fait `/scaffold`). Ailleurs, elle reste muette.
+
+| Moment | Ce qui se passe | Coût |
+|---|---|---|
+| **Démarrage** | Le bloc « Session courante » du projet actif est injecté dans le contexte : Claude sait où tu en étais, sans `/resume`. | Quelques lignes, aucun appel au modèle |
+| **En cours de session** | Toutes les 8 demandes, Claude ajoute 3 à 6 puces au log du jour et met à jour la MAP, sans rien te demander. Sa réponse se termine par « Mémoire mise à jour. » | Une courte écriture par sauvegarde |
+| **Fermeture** | S'il reste des demandes non sauvegardées, un script note la date, les fichiers modifiés et le chemin de la conversation dans `Sessions/journal-auto.md`. Au démarrage suivant, Claude propose de rattraper. | Aucun appel au modèle |
+
+Réglages :
+- Changer la fréquence : variable d'environnement `OBSIDIAN_MEMORY_SAVE_EVERY` (par exemple `4`, ou `0` pour couper la sauvegarde en cours de session).
+- Ne pas l'installer : `./install.sh --no-hooks "<vault>"` (Windows : `-NoHooks`).
+- La retirer : `./install.sh --remove-hooks` (Windows : `-RemoveHooks`). Tes autres réglages Claude Code ne sont pas touchés ; une copie `.bak` de `settings.json` est faite à chaque modification.
+
+> Disponible dans Claude Code et l'onglet Code de Claude Desktop. Dans Cowork et le mode chat, `/resume` et `/compress` restent manuels.
 
 ---
 
@@ -351,7 +372,9 @@ foreach ($n in "resume","client-brief","compress","preserve","scaffold","audit-v
 }
 ```
 
-Avec le plugin : `/plugin uninstall obsidian-memory`. Tes notes Obsidian ne sont jamais effacées par ces commandes.
+Puis retire la mémoire automatique : `./install.sh --remove-hooks` (Windows : `.\install.ps1 -RemoveHooks`).
+
+Avec le plugin : `/plugin uninstall obsidian-memory` (les hooks partent avec). Tes notes Obsidian ne sont jamais effacées par ces commandes.
 
 ---
 
@@ -364,11 +387,14 @@ obsidian-claude-system/
 │   ├── resume/  client-brief/  compress/  preserve/  scaffold/  audit-vault/
 │   ├── lint-vault/               # + scripts/lint-vault.sh (contrôle POSIX, lecture seule)
 │   └── obsidian-note-system/     # La gouvernance (+ references/ : gabarits, scripts, syntaxe)
+├── hooks/                        # Mémoire automatique : démarrage, sauvegarde, fermeture (+ hooks.json du plugin)
 ├── vault-template/               # Squelette de vault Obsidian à copier
 ├── docs/claude-desktop.md        # Installation Cowork et mode chat
 ├── scripts/
 │   ├── validate-skills.sh        # Contrôle des skills (CI)
 │   ├── package.sh                # Construit le .plugin et les zips de skills (dist/)
+│   ├── test-hooks.sh             # Tests des hooks sur un vault factice (CI)
+│   ├── hooks-settings.py         # Ajoute / retire les hooks dans ~/.claude/settings.json
 │   └── pre-commit.sample         # Hook : bloque un commit qui viole le schéma du vault
 ├── install.sh / install.ps1      # Installation macOS-Linux / Windows
 └── README.md
