@@ -26,6 +26,7 @@ Avec un shell (Claude Code, Cowork) : suivre les étapes telles quelles. Sans sh
 2. FIDÉLITÉ : restituer uniquement ce qui figure dans les fichiers chargés ; ne pas inférer l'état d'avancement.
 3. EXPIRATION : vérifier les champs `expires:` du frontmatter des fichiers chargés. Tout `expires:` dépassé → alerter explicitement (contexte potentiellement obsolète), ne pas le traiter comme actif.
 4. AUTO-RÉPARATION : si le bloc "Session courante" est absent du MAP, l'ajouter (<session_block_template>) AVANT toute autre action.
+5. MÉMOIRE AUTOMATIQUE : si le contexte contient déjà un message `[obsidian-memory]` injecté au démarrage pour la même entité, ne pas relire le MAP : partir de ce bloc et charger seulement les fichiers de « Charger ».
 </strict_rules>
 
 <workflow_steps>

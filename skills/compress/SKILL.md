@@ -7,6 +7,7 @@ description: "Sauvegarde la session en cours dans le vault Obsidian : log daté,
 
 <purpose>
 Sauvegarder et archiver la session en cours dans le système Obsidian v2.0, en suivant strictement une checklist ordonnée. Produire un log optimisé pour la prochaine session + mettre à jour le vault.
+Avec la mémoire automatique (hooks), de courtes entrées « (auto) » sont déjà ajoutées au log du jour en cours de session : /compress fait le bilan complet (TASKS, DECISIONS, BRIEF, lint) et COMPLÈTE ce log au lieu d'en créer un second.
 </purpose>
 
 <vault_root>
@@ -28,6 +29,7 @@ Avec un shell (Claude Code, Cowork) : suivre les étapes telles quelles. Sans sh
 </strict_rules>
 
 <workflow_steps>
+0. RATTRAPAGE (seulement si demandé) : quand le démarrage a signalé une « Session précédente non sauvegardée » et que l'utilisateur accepte de la rattraper, lire le transcript indiqué en ne gardant que les messages de l'utilisateur et les réponses texte (ignorer les gros résultats d'outils), puis dérouler les étapes ci-dessous pour CETTE session-là, avec sa date.
 1. LOG : créer le fichier daté `YYYY-MM-DD.md` dans le bon dossier (Projet → `Projets/[X]/Sessions/`, Client → `Clients/[X]/Sessions/`). Routage si la session touche 2 entités : log dans le **projet** si l'action = code, dans le **client** si l'action = stratégie/communication. Multi-sessions le même jour → `YYYY-MM-DD-matin.md` ou `YYYY-MM-DD-[client].md`. Utiliser le <log_template>.
 2. MAP : mettre à jour la section "Session courante" (projet) ou "Chantiers actifs" (client) dans le MAP concerné.
 3. TASKS : cocher les tâches terminées (remplacer `[ ]` par `[x]`) dans `TASKS.md`.

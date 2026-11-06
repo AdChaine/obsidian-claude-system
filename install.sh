@@ -5,11 +5,35 @@
 #   ./install.sh                      # installe ; le vault sera détecté ou demandé à l'usage
 #   ./install.sh "/chemin/vers/vault" # installe, crée le vault à partir de vault-template/
 #                                     # s'il n'existe pas encore, et fixe son chemin
+# Options :
+#   --no-hooks      n'active pas la mémoire automatique (chargement au démarrage, sauvegarde en cours de session)
+#   --remove-hooks  désactive la mémoire automatique et s'arrête là
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VAULT_PATH="${1:-}"
+VAULT_PATH=""; HOOKS=1; REMOVE_HOOKS=0
+for a in "$@"; do
+  case "$a" in
+    --no-hooks) HOOKS=0 ;;
+    --remove-hooks) REMOVE_HOOKS=1 ;;
+    -*) echo "Option inconnue : $a"; exit 2 ;;
+    *) VAULT_PATH="$a" ;;
+  esac
+done
 CLAUDE_DIR="$HOME/.claude"
+HOOKS_DIR="$CLAUDE_DIR/obsidian-memory/hooks"
+SETTINGS="$CLAUDE_DIR/settings.json"
+
+if [ "$REMOVE_HOOKS" = 1 ]; then
+  if command -v python3 >/dev/null 2>&1; then
+    python3 "$REPO_DIR/scripts/hooks-settings.py" remove "$SETTINGS" "$HOOKS_DIR"
+    rm -rf "$HOOKS_DIR"
+    echo "✓ Mémoire automatique désactivée (hooks retirés de $SETTINGS, sauvegarde .bak faite)."
+  else
+    echo "python3 introuvable : retire à la main de $SETTINGS les hooks qui pointent vers $HOOKS_DIR."
+  fi
+  exit 0
+fi
 SKILLS_DIR="$CLAUDE_DIR/skills"
 CMD_DIR="$CLAUDE_DIR/commands"
 STAMP="$(date +%s)"
@@ -59,6 +83,18 @@ if [ -n "$VAULT_PATH" ]; then
   fi
 else
   echo "  ℹ️  Aucun chemin fourni : le vault sera détecté (dossier de travail) ou demandé à l'usage."
+fi
+
+# Mémoire automatique : hooks SessionStart / Stop / SessionEnd (muets hors d'un vault).
+if [ "$HOOKS" = 1 ]; then
+  mkdir -p "$HOOKS_DIR"
+  cp "$REPO_DIR"/hooks/*.sh "$HOOKS_DIR"/
+  if command -v python3 >/dev/null 2>&1; then
+    python3 "$REPO_DIR/scripts/hooks-settings.py" add "$SETTINGS" "$HOOKS_DIR"
+    echo "  ✓ mémoire automatique activée (désactiver : ./install.sh --remove-hooks)"
+  else
+    echo "  ⚠️  python3 introuvable : mémoire automatique non activée. Voir README, section « Mémoire automatique »."
+  fi
 fi
 
 echo ""

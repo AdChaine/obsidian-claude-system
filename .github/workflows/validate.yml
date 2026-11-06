@@ -30,3 +30,40 @@ jobs:
           HOME="$T" bash install.sh "$T/Documents/mon-cerveau"
           grep -q "note perso" "$T/Documents/mon-cerveau/perso.md"
           ! HOME="$T" bash install.sh "$PWD/vault-dans-le-depot"
+      - name: Hooks de mémoire automatique
+        run: bash scripts/test-hooks.sh
+      - name: install.sh active les hooks sans toucher aux réglages existants, et sait les retirer
+        run: |
+          T="$(mktemp -d)"; mkdir -p "$T/.claude"
+          echo '{"model":"x","hooks":{"Stop":[{"hooks":[{"type":"command","command":"echo autre"}]}]}}' > "$T/.claude/settings.json"
+          HOME="$T" bash install.sh "$T/v"; HOME="$T" bash install.sh "$T/v"
+          test "$(grep -c 'obsidian-memory/hooks/' "$T/.claude/settings.json")" = 3
+          grep -q 'echo autre' "$T/.claude/settings.json"
+          HOME="$T" bash install.sh --remove-hooks
+          ! grep -q 'obsidian-memory/hooks/' "$T/.claude/settings.json"
+          grep -q '"model": "x"' "$T/.claude/settings.json"
+
+  install-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install.ps1 crée le vault, active puis retire les hooks
+        shell: pwsh
+        run: |
+          $T = Join-Path $env:RUNNER_TEMP "om"; New-Item -ItemType Directory -Force "$T\.claude" | Out-Null
+          '{"model":"x","hooks":{"Stop":[{"hooks":[{"type":"command","command":"echo autre"}]}]}}' | Set-Content "$T\.claude\settings.json"
+          $env:USERPROFILE = $T
+          .\install.ps1 -VaultPath "$T\Documents\mon-cerveau"
+          .\install.ps1 -VaultPath "$T\Documents\mon-cerveau"
+          if (-not (Test-Path "$T\Documents\mon-cerveau\CLAUDE.md")) { throw "vault non créé" }
+          $s = Get-Content "$T\.claude\settings.json" -Raw
+          $s | ConvertFrom-Json | Out-Null
+          if (([regex]::Matches($s, 'obsidian-memory/hooks/')).Count -ne 3) { throw "hooks : 3 attendus`n$s" }
+          if ($s -notmatch 'echo autre') { throw "hook existant perdu" }
+          .\install.ps1 -RemoveHooks
+          $s = Get-Content "$T\.claude\settings.json" -Raw
+          if ($s -match 'obsidian-memory/hooks/') { throw "hooks non retirés" }
+          if ($s -notmatch '"model"') { throw "réglage existant perdu" }
+      - name: Les hooks tournent sous Git Bash
+        shell: bash
+        run: bash scripts/test-hooks.sh
